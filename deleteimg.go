@@ -58,33 +58,37 @@ func main() {
 		fmt.Println("Num" + strconv.Itoa(int(k)) + "   " + shotname)
 		preserveImg = append(preserveImg, shotname)
 	}
-	fmt.Println(preserveImg)
+	//	fmt.Println(preserveImg)
 
 	//	操作路径，读取路径所含文件
-	pathname := config.DeletePathName
-	files, err := ioutil.ReadDir(pathname)
+	pathnames := config.DeletePathName
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	for _, pathname := range pathnames {
 
-LABEL:
-	//	遍历文件，每遍历一个，查询slice中是否含有该名，没有则删除文件
-	for _, file := range files {
-		if file.IsDir() {
-			continue LABEL
-		} else {
-			filename := file.Name()
-			for _, preImg := range preserveImg {
-				if string(preImg) == string(filename) {
-					continue LABEL
+		files, err := ioutil.ReadDir(pathname)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	LABEL:
+		//	遍历文件，每遍历一个，查询slice中是否含有该名，没有则删除文件
+		for _, file := range files {
+			if file.IsDir() {
+				continue LABEL
+			} else {
+				filename := file.Name()
+				for _, preImg := range preserveImg {
+					if string(preImg) == string(filename) {
+						continue LABEL
+					}
 				}
+				err = os.Remove(pathname + filename)
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Println(pathname, filename, "删除成功!")
 			}
-			err = os.Remove(pathname + filename)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(pathname, filename, "删除成功!")
 		}
 	}
 
